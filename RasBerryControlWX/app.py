@@ -1,20 +1,31 @@
 from wxpy import *
-import picamera
+from picamera2 import Picamera2
+import time
 
-bot = Bot(cache_path=True)  # 扫码登录微信
-my_friend = bot.friends().search('接收者微信备注名')[0]  # 指定消息接收人
+# 初始化picamera2
+picam2 = Picamera2()
+config = picam2.create_still_configuration()  # 创建静态图片配置
+picam2.configure(config)  # 应用配置
+picam2.start()  # 启动摄像头（预热）
 
-@bot.register(msg_types=TEXT)
-def handle_message(msg):
-    if msg.text == '拍照':  # 接收拍照指令
-        with picamera.PiCamera() as camera:
-            camera.resolution = (800, 600)
-            camera.capture('/tmp/image.jpg')  # 保存临时文件
-            my_friend.send_image('/tmp/image.jpg')  # 发送照片[1,4,7](@ref)
-    elif msg.text == '录像':  # 扩展视频功能
-        camera.start_recording('video.h264')
-        camera.wait_recording(10)  # 录10秒
-        camera.stop_recording()
-        my_friend.send_video('video.h264')
+# 微信登录
+bot = Bot(cache_path=True, console_qr=2)  # console_qr=2支持文本设备扫码
+my_friend = bot.friends().search('孤烟')[0]  # 替换为实际备注
 
-bot.join()  # 保持运行
+
+@bot.register(my_friend, msg_types=TEXT)
+def reply_photo(msg):
+    if msg.text == '拍照':
+        # 拍照并保存
+        timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        file_path = f"/tmp/{timestamp}.jpg"
+
+        picam2.capture_file(file_path)  # 使用picamera2拍照
+        msg.reply_image(file_path)  # 直接回复发送图片
+        print("照片已发送")
+    else:
+        # 其他指令处理
+        pass
+
+
+bot.join()  # 阻塞线程（wxpy写法）或 bot.join()
