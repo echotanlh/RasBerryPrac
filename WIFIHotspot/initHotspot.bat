@@ -1,5 +1,5 @@
 #!/bin/bash
-# 树莓派5热点自动配置脚本 (create_ap版)
+# 树莓派5热点自动配置脚本 (create_ap版).
 # 使用方法：sudo ./setup_hotspot.sh
 
 # 检查root权限
