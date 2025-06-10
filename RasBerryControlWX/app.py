@@ -4,7 +4,7 @@ import time
 import os
 
 # 初始化微信机器人（扫码登录）
-bot = Bot(cache_path=True, console_qr=2)
+bot = Bot(console_qr=2)
 friend = bot.friends().search('孤烟')[0]  # 替换为实际好友备注
 
 # 初始化摄像头
