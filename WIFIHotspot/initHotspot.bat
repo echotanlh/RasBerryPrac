@@ -13,7 +13,7 @@ WIFI_IFACE="wlan0"             # 无线网卡名称
 INTERNET_IFACE="eth0"          # 有线上网网卡
 SSID="RPi5_Hotspot"            # 热点名称
 PASSWORD="tanlihua"        # 密码（至少8位）
-CHANNEL="153"                    # 推荐信道（避免冲突）
+CHANNEL="149"                    # 推荐信道（避免冲突）
 GATEWAY="10.0.0.1"             # 热点网关IP
 FREQ_BAND="5"                  # 频段：2.4或5GHz（树莓派5支持5GHz）
 
@@ -21,16 +21,34 @@ FREQ_BAND="5"                  # 频段：2.4或5GHz（树莓派5支持5GHz）
 # 创建配置文件
 echo "[3/4] 生成配置文件..."
 cat << EOF > /etc/create_ap.conf
+CHANNEL=default
+GATEWAY=10.0.0.1
+WPA_VERSION=2
+ETC_HOSTS=0
+DHCP_DNS=gateway
+NO_DNS=0
+NO_DNSMASQ=0
+HIDDEN=0
+MAC_FILTER=0
+MAC_FILTER_ACCEPT=/etc/hostapd/hostapd.accept
+ISOLATE_CLIENTS=0
+SHARE_METHOD=nat
+IEEE80211N=0
+IEEE80211AC=0
+HT_CAPAB=[HT40+]
+VHT_CAPAB=
+DRIVER=nl80211
+NO_VIRT=0
+COUNTRY=
+FREQ_BAND=2.4
+NEW_MACADDR=
+DAEMONIZE=0
+NO_HAVEGED=0
+WIFI_IFACE=wlan0
+INTERNET_IFACE=eth0
 SSID=$SSID
 PASSPHRASE=$PASSWORD
-GATEWAY=$GATEWAY
-CHANNEL=$CHANNEL
-FREQ_BAND=$FREQ_BAND
-WIFI_IFACE=$WIFI_IFACE
-INTERNET_IFACE=$INTERNET_IFACE
-SHARE_METHOD=nat
-NO_VIRT=1
-COUNTRY_CODE=CN
+USE_PSK=0
 EOF
 
 # 创建启动脚本
