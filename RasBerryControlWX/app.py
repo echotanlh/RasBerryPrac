@@ -15,6 +15,6 @@ def handle_message(msg):
         camera.start_recording('video.h264')
         camera.wait_recording(10)  # 录10秒
         camera.stop_recording()
-        my_friend.send_video('video.h264')[1](@ref)
+        my_friend.send_video('video.h264')
 
 bot.join()  # 保持运行
