@@ -13,7 +13,7 @@ WIFI_IFACE="wlan0"             # 无线网卡名称
 INTERNET_IFACE="eth0"          # 有线上网网卡
 SSID="RPi5_Hotspot"            # 热点名称
 PASSWORD="tanlihua"        # 密码（至少8位）
-CHANNEL="6"                    # 推荐信道（避免冲突）
+CHANNEL="149"                    # 推荐信道（避免冲突）
 GATEWAY="10.0.0.1"             # 热点网关IP
 FREQ_BAND="5"                  # 频段：2.4或5GHz（树莓派5支持5GHz）
 
