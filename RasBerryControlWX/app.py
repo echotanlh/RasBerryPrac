@@ -1,31 +1,31 @@
-from wxpy import *
+from wxpy import Bot
 from picamera2 import Picamera2
 import time
+import os
 
-# 初始化picamera2
+# 初始化微信机器人（扫码登录）
+bot = Bot()
+friend = bot.friends().search('孤烟')[0]  # 替换为实际好友备注
+
+# 初始化摄像头
 picam2 = Picamera2()
-config = picam2.create_still_configuration()  # 创建静态图片配置
-picam2.configure(config)  # 应用配置
-picam2.start()  # 启动摄像头（预热）
+config = picam2.create_still_configuration(main={"size": (1024, 768)})
+picam2.configure(config)
 
-# 微信登录
-bot = Bot(cache_path=True, console_qr=2)  # console_qr=2支持文本设备扫码
-my_friend = bot.friends().search('孤烟')[0]  # 替换为实际备注
-
-
-@bot.register(my_friend, msg_types=TEXT)
-def reply_photo(msg):
+@bot.register(friend, msg_types='Text')
+def handle_message(msg):
     if msg.text == '拍照':
-        # 拍照并保存
-        timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        file_path = f"/tmp/{timestamp}.jpg"
+        try:
+            picam2.start()
+            time.sleep(1)  # 等待摄像头稳定
+            img_path = f"/home/pi/images/{int(time.time())}.jpg"
+            picam2.capture_file(img_path)
+            msg.reply_image(img_path)  # 发送照片到微信
+            os.remove(img_path)  # 清理临时文件
+        except Exception as e:
+            msg.reply(f"拍照失败: {str(e)}")
+        finally:
+            picam2.stop()
 
-        picam2.capture_file(file_path)  # 使用picamera2拍照
-        msg.reply_image(file_path)  # 直接回复发送图片
-        print("照片已发送")
-    else:
-        # 其他指令处理
-        pass
-
-
-bot.join()  # 阻塞线程（wxpy写法）或 bot.join()
+# 保持运行
+bot.join()
