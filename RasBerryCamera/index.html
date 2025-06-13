@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>鱼目标实时检测</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .count-display {
+            font-size: 24px;
+            margin: 20px;
+            padding: 15px 30px;
+            background: #f0f8ff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-container {
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #live-video {
+            width: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>实时鱼目标检测与计数</h2>
+        <div class="count-display">
+            当前鱼数量: <span id="fishCount">0</span>
+        </div>
+        <div class="video-container">
+            <img id="live-video" src="{{ url_for('video_feed') }}">
+        </div>
+    </div>
+
+    <script>
+        // 实时更新鱼数量
+        function updateFishCount() {
+            fetch('/fish_count')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('fishCount').textContent = data.count;
+                    setTimeout(updateFishCount, 1000);  // 每秒更新
+                })
+                .catch(error => {
+                    console.error('获取鱼数量失败:', error);
+                    setTimeout(updateFishCount, 2000);  // 2秒后重试
+                });
+        }
+
+        // 页面加载完成后启动
+        document.addEventListener('DOMContentLoaded', () => {
+            updateFishCount();
+
+            // 处理视频加载错误
+            const videoElement = document.getElementById('live-video');
+            videoElement.onerror = () => {
+                console.log('视频加载失败，尝试重新连接...');
+                setTimeout(() => {
+                    videoElement.src = "{{ url_for('video_feed') }}?t=" + new Date().getTime();
+                }, 2000);
+            };
+        });
+    </script>
+</body>
+</html>
